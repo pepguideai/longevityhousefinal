@@ -12,18 +12,18 @@ window.CONTENT = window.CONTENT || {}; window.CONTENT.coaching = {
   valueEyebrow: "The Coaching",
   valueHeadline: "Everything you need to actually change.",  // "actually change" in italic green
   valueHeadlineItalic: "actually change.",
-  valueLede: "Six ways we walk with you — between sessions, through the hard parts, all the way to lasting change.",
+  valueLede: "Five pillars we walk with you through — between sessions, through the hard parts, all the way to lasting change.",
 
   /* The six value cards. "icon" picks the line drawing —
      options: mindfulness, education, support, budget, supplement, network
      Each opens a pop-up; add a "blurb" to fill it. */
   values: [
-    { icon: "mindfulness", title: "Mindfulness Practices",      text: "Breathwork, meditation, and presence tools you can use anywhere.", blurb: "" },
-    { icon: "education",   title: "Food Education",             text: "Understanding the why behind what you eat — not just the what.", blurb: "" },
-    { icon: "support",     title: "Live Support",               text: "Real answers in real time, between sessions, when life happens.", blurb: "" },
-    { icon: "budget",      title: "Budgeting & Meal Planning",  text: "Eating well on a real budget — grocery lists, plans, and structure.", blurb: "" },
-    { icon: "supplement",  title: "Supplement Guidance",        text: "Medication and supplement support — including peptide cycling.", blurb: "" },
-    { icon: "network",     title: "Roundtable Access",          text: "Your curated circle of vetted holistic specialists, coordinated for you.", blurb: "" },
+    /* icon = the image filename: assets/img/value-<icon>.jpg */
+    { icon: "move",     title: "Move",     text: "Fitness • Mobility • Performance" },
+    { icon: "restore",  title: "Restore",  text: "Recovery • Massage • Sauna • Sleep" },
+    { icon: "nourish",  title: "Nourish",  text: "Nutrition • Food • Supplements" },
+    { icon: "optimize", title: "Optimize", text: "Functional health • Diagnostics • Emerging science" },
+    { icon: "connect",  title: "Connect",  text: "Mental wellness • Community • Experiences" },
   ],
 
   /* ---- SECTION 2: PRICING ---- */

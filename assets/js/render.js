@@ -114,11 +114,11 @@
         ${slot(P.image, "hero-img")}
         <div class="hero-in">
           <h1>${P.cascade.line1}<br/>${P.cascade.line2}</h1>
-          <p class="tagline">${P.cascade.line3}</p>
+          ${P.cascade.line3 ? `<p class="tagline">${P.cascade.line3}</p>` : ""}
           <div class="hair"></div>
           <div class="hero-ctas">
             <a href="${P.primaryCtaHref}" class="btn">${P.primaryCtaLabel} ${arrow}</a>
-            <a href="${P.secondaryCtaHref}" class="textlink">${P.secondaryCtaLabel} ${arrow}</a>
+            ${P.secondaryCtaLabel ? `<a href="${P.secondaryCtaHref}" class="textlink">${P.secondaryCtaLabel} ${arrow}</a>` : ""}
           </div>
         </div>
         <div class="ticker">${ticker}</div>
@@ -177,9 +177,10 @@
             <div class="eyebrow">${P.eyebrow}</div>
             <h2>${emphasize(P.headline, P.headlineItalicWord)}</h2>
             <p class="lede">${P.lede}</p>
+            ${(P.modalities && P.modalities.length) ? `
             <div class="hair"></div>
             <div class="k">${P.modalitiesLabel}</div>
-            <ul class="mods">${P.modalities.map(m => `<li>${m.name}</li>`).join("")}</ul>
+            <ul class="mods">${P.modalities.map(m => `<li>${m.name}</li>`).join("")}</ul>` : ""}
           </div>
           <div class="rt-viz">
             <div class="rt-table">

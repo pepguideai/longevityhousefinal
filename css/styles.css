@@ -84,7 +84,7 @@ h2 em, h3 em, .bt em { font-style: italic; text-transform: none; letter-spacing:
 .hero-in { position: relative; z-index: 2; padding: 0 var(--pad); max-width: 900px; }
 .hero h1 { font-size: clamp(48px, 5.6vw, 78px); letter-spacing: 0.16em; text-transform: uppercase; line-height: 1.04; color: var(--text-primary); }
 .hero .tagline { font-family: var(--serif); font-style: italic; font-size: clamp(22px, 2vw, 28px); color: var(--text-primary); margin-top: 22px; }
-.hero .hair { margin: 26px 0 32px; }
+.hero .hair { margin: 30px 0 32px; }
 .hero-ctas { display: flex; align-items: center; gap: 32px; }
 .hero .ticker { position: absolute; z-index: 2; left: var(--pad); bottom: 42px; display: flex; gap: 20px; align-items: center; font-size: 10px; letter-spacing: 0.34em; text-transform: uppercase; color: var(--text-primary); }
 .hero .ticker i { font-style: normal; color: var(--accent); font-size: 8px; }
@@ -133,13 +133,13 @@ h2 em, h3 em, .bt em { font-style: italic; text-transform: none; letter-spacing:
 
 /* ---------- COACHING (pillar cards) ---------- */
 .coaching { background: var(--bg-darkest); }
-.pcards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.pcards { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
 .pcard { border: 1px solid var(--line); background: var(--bg-main); display: flex; flex-direction: column; transition: border-color .25s; }
 .pcard:hover { border-color: var(--highlight); }
-.pcard-img { height: 190px; }
+.pcard-img { height: 170px; }
 .pcard-b { padding: 24px 24px 26px; }
-.pcard h3 { font-size: 21px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 10px; }
-.pcard p { font-size: 13px; line-height: 1.65; color: var(--text-second); min-height: 42px; }
+.pcard h3 { font-size: 20px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 10px; }
+.pcard p { font-size: 12px; line-height: 1.7; color: var(--text-second); min-height: 42px; letter-spacing: 0.02em; }
 .pcard .arr { color: var(--highlight); margin-top: 14px; }
 
 /* ---------- PRICING ---------- */
@@ -288,7 +288,7 @@ h2 em, h3 em, .bt em { font-style: italic; text-transform: none; letter-spacing:
 @media (max-width: 1100px) {
   :root { --pad: 40px; }
   .nav-side { gap: 22px; }
-  .pcards { grid-template-columns: repeat(2, 1fr); }
+  .pcards { grid-template-columns: repeat(3, 1fr); }
   .rt-table { width: 400px; height: 400px; }
   .rt-seat { width: 130px; }
 }
