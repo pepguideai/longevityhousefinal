@@ -340,7 +340,7 @@
   function infoModalHtml() {
     return `
       <div class="overlay" id="info-modal"><div class="modal">
-        <button class="close" aria-label="Close">×</button>
+        <button class="close" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
         <div class="eyebrow m-eye"></div>
         <h3></h3>
         <p class="m-body"></p>
@@ -388,13 +388,16 @@
   function pillarModalHtml() {
     return `
       <div class="overlay" id="pillar-modal"><div class="modal">
-        <button class="close" aria-label="Close">×</button>
+        <button class="close" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
         <div class="ix-large"></div>
         <div class="eyebrow p-lab"></div>
         <h3></h3>
         <p class="statement"></p>
         <p class="detail"></p>
-        <div class="m-foot"><div class="pos"></div><div class="marrows"><button data-dir="-1">←</button><button data-dir="1">→</button></div></div>
+        <div class="m-foot"><div class="pos"></div><div class="marrows">
+            <button data-dir="-1" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+            <button data-dir="1" aria-label="Next"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          </div></div>
       </div></div>`;
   }
   function wireApproachModal() {
