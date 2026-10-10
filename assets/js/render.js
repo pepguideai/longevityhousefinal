@@ -295,9 +295,21 @@
     if (bookUrl && /calendar\.google\.com/.test(bookUrl) && !/gv=true/.test(bookUrl)) {
       bookUrl += (bookUrl.includes("?") ? "&" : "?") + "gv=true";
     }
-    const booking = bookUrl
-      ? `<iframe src="${bookUrl}" title="Booking calendar" loading="lazy"></iframe>`
-      : `<div class="embed"><div class="k">${P.embedTag}</div><div class="en">${P.embedPlaceholder}</div></div>`;
+    const openUrl = bookUrl.replace(/[?&]gv=true/, "");
+    let booking;
+    if (!bookUrl) {
+      booking = `<div class="embed"><div class="k">${P.embedTag}</div><div class="en">${P.embedPlaceholder}</div></div>`;
+    } else if (S.bookingMode === "embed") {
+      booking = `<iframe src="${bookUrl}" title="Booking calendar" loading="lazy"></iframe>`;
+    } else {
+      booking = `
+        <div class="book-invite">
+          <p class="bi-blurb">${S.bookingBlurb || ""}</p>
+          <ul class="bi-points">${(S.bookingPoints || []).map(x => `<li>${x}</li>`).join("")}</ul>
+          <a class="btn solid bi-btn" href="${openUrl}" target="_blank" rel="noopener">${S.bookingButton || "Reserve your call"} ${arrow}</a>
+          <div class="bi-note">Opens a secure booking page in a new tab.</div>
+        </div>`;
+    }
     return `
       <section class="section begin page-section" id="begin">
         <div class="band">

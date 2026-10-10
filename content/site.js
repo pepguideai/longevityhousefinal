@@ -36,6 +36,12 @@ window.SITE = {
   bookingHeadline: "Book your first session",
   bookingSubtitle: "Free 20-minute intro call",
   bookingDuration: "20 min",
+  /* "link" = styled panel with a button that opens the booking page (recommended).
+     "embed" = Google's calendar drawn inside the page (clashes with the dark design). */
+  bookingMode: "link",
+  bookingButton: "Reserve your call",
+  bookingBlurb: "Twenty minutes, no preparation needed. We'll talk about where you are, what you're hoping to change, and whether the House is the right fit.",
+  bookingPoints: ["Choose any open time", "Video or phone — your call", "Confirmation straight to your inbox"],
 
   /* ---- CHECKOUT / PAYMENTS ----
      The cart and checkout pages work now; real payment happens
