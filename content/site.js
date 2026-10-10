@@ -32,7 +32,7 @@ window.SITE = {
      When you have a Calendly / Acuity / Cal.com link, paste it here.
      Until then, leave it as "" and the Begin page shows a styled
      placeholder where the calendar will appear. */
-  bookingUrl: "",
+  bookingUrl: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ2MpsipnXrtpOUDTUvj2soqL6B4qb64YDXAbngnJQaSlnI5TcYtWg90EUw8Vvh3pm8hUVOMjMid?gv=true",
   bookingHeadline: "Book your first session",
   bookingSubtitle: "Free 20-minute intro call",
   bookingDuration: "20 min",

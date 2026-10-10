@@ -290,8 +290,13 @@
     const P = C.begin;
     const steps = P.steps.map(s => `
       <div class="step"><span class="num">${s.num}</span><div><h4>${s.title}</h4><p>${s.text}</p></div></div>`).join("");
-    const booking = (S.bookingUrl && S.bookingUrl.trim())
-      ? `<iframe src="${S.bookingUrl}" title="Booking calendar"></iframe>`
+    /* Google appointment pages only embed with the gv=true flag — add it if missing */
+    let bookUrl = (S.bookingUrl || "").trim();
+    if (bookUrl && /calendar\.google\.com/.test(bookUrl) && !/gv=true/.test(bookUrl)) {
+      bookUrl += (bookUrl.includes("?") ? "&" : "?") + "gv=true";
+    }
+    const booking = bookUrl
+      ? `<iframe src="${bookUrl}" title="Booking calendar" loading="lazy"></iframe>`
       : `<div class="embed"><div class="k">${P.embedTag}</div><div class="en">${P.embedPlaceholder}</div></div>`;
     return `
       <section class="section begin page-section" id="begin">
