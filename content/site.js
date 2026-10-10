@@ -61,7 +61,7 @@ window.SITE = {
 
   /* ---- CONTACT (shown in the footer) ---- */
   contact: {
-    email: "hello@longevityhouse.com",
+    email: "cole@longevityhousellc.com",
     location: "",   // add your city here when ready, e.g. "Austin, Texas"
     instagram: "@longevityhouse",
   },
