@@ -18,7 +18,7 @@ window.CONTENT = window.CONTENT || {}; window.CONTENT.roundtable = {
     { position: "n", title: "Chiro Care & Massage",  sub: "structural & hands-on care" },
     { position: "e", title: "Wellness Clinics",      sub: "IV, hyperbaric, red light & salt" },
     { position: "s", title: "Functional Medicine",   sub: "root-cause practitioners" },
-    { position: "w", title: "Longevity & Peptides",  sub: "vetted research companies" },
+    { position: "w", title: "Longevity Research",   sub: "vetted research partners" },
   ],
 
   /* Optional supporting list under the intro. Leave empty to hide. */

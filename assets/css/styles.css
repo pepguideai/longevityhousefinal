@@ -115,21 +115,27 @@ h2 em, h3 em, .bt em { font-style: italic; text-transform: none; letter-spacing:
 .mods { margin-top: 14px; }
 .mods li { font-family: var(--serif); font-size: 19px; color: var(--text-primary); padding: 10px 0; border-bottom: 1px solid var(--line-soft); }
 .rt-viz { display: flex; justify-content: center; }
-.rt-table { position: relative; width: 480px; height: 480px; }
-.rt-table::before { content: ""; position: absolute; inset: 40px; border: 1px solid var(--line); border-radius: 50%; }
-.rt-table::after { content: ""; position: absolute; inset: 120px; border: 1px dashed rgba(154,134,107,0.35); border-radius: 50%; }
+.rt-table { position: relative; width: 700px; height: 540px; --rx: 190px; --ry: 110px; }
+.rt-table::before { content: ""; position: absolute; left: var(--rx); right: var(--rx); top: var(--ry); bottom: var(--ry); border: 1px solid var(--line); border-radius: 50%; }
+.rt-table::after { content: ""; position: absolute; left: calc(var(--rx) + 42px); right: calc(var(--rx) + 42px); top: calc(var(--ry) + 42px); bottom: calc(var(--ry) + 42px); border: 1px dashed rgba(154,134,107,0.35); border-radius: 50%; }
 .rt-center { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 176px; height: 176px; border-radius: 50%; background: var(--card); border: 1px solid var(--highlight); display: flex; align-items: center; justify-content: center; text-align: center; box-shadow: 0 0 0 14px rgba(129,119,106,0.18); }
 .rt-center span { font-family: var(--serif); font-size: 26px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-primary); line-height: 1.1; }
 .rt-center small { display: block; font-family: var(--sans); font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--bg-darkest); margin-top: 8px; }
-.rt-seat { position: absolute; width: 170px; text-align: center; }
-.rt-seat .dot { width: 16px; height: 16px; border-radius: 50%; background: var(--highlight); margin: 0 auto 12px; box-shadow: 0 0 0 6px rgba(209,197,180,0.16); }
-.rt-seat .stitle { display: block; font-family: var(--serif); font-size: 18px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-primary); }
+/* dots sit exactly on the ring's four compass points */
+.rt-dot { position: absolute; width: 14px; height: 14px; border-radius: 50%; background: var(--highlight); box-shadow: 0 0 0 6px rgba(209,197,180,0.16), 0 0 0 1px var(--bg-main); transform: translate(-50%, -50%); }
+.rt-dot.n { left: 50%; top: var(--ry); }
+.rt-dot.s { left: 50%; top: calc(100% - var(--ry)); }
+.rt-dot.e { left: calc(100% - var(--rx)); top: 50%; }
+.rt-dot.w { left: var(--rx); top: 50%; }
+/* labels sit just outside each dot */
+.rt-seat { position: absolute; width: 160px; text-align: center; }
+.rt-seat.e, .rt-seat.w { width: 190px; }
+.rt-seat .stitle { display: block; font-family: var(--serif); font-size: 18px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-primary); line-height: 1.2; }
 .rt-seat .ssub { display: block; font-size: 11px; letter-spacing: 0.06em; color: var(--text-second); margin-top: 3px; }
-.rt-seat.n { left: 50%; top: 0; transform: translateX(-50%); }
-.rt-seat.s { left: 50%; bottom: 0; transform: translateX(-50%); display: flex; flex-direction: column; }
-.rt-seat.s .dot { order: 3; margin: 10px auto 0; }
-.rt-seat.e { right: -40px; top: 50%; transform: translateY(-50%); }
-.rt-seat.w { left: -40px; top: 50%; transform: translateY(-50%); }
+.rt-seat.n { left: 50%; bottom: calc(100% - var(--ry) + 18px); transform: translateX(-50%); }
+.rt-seat.s { left: 50%; top: calc(100% - var(--ry) + 18px); transform: translateX(-50%); }
+.rt-seat.e { left: calc(100% - var(--rx) + 22px); top: 50%; transform: translateY(-50%); text-align: left; }
+.rt-seat.w { right: calc(100% - var(--rx) + 22px); top: 50%; transform: translateY(-50%); text-align: right; }
 
 /* ---------- COACHING (pillar cards) ---------- */
 .coaching { background: var(--bg-darkest); }
@@ -299,7 +305,7 @@ h2 em, h3 em, .bt em { font-style: italic; text-transform: none; letter-spacing:
   :root { --pad: 40px; }
   .nav-side { gap: 22px; }
   .pcards { grid-template-columns: repeat(3, 1fr); }
-  .rt-table { width: 400px; height: 400px; }
+  .rt-table { width: 560px; height: 480px; --rx: 150px; --ry: 100px; }
   .rt-seat { width: 130px; }
 }
 @media (max-width: 860px) {
@@ -320,8 +326,12 @@ h2 em, h3 em, .bt em { font-style: italic; text-transform: none; letter-spacing:
   .split-img { height: 320px; }
   .venn-lists { grid-template-columns: 1fr; }
   .pillars, .pcards, .tiers { grid-template-columns: 1fr; }
-  .rt-table { width: 320px; height: 320px; }
-  .rt-seat { width: 110px; }
+  /* phones: medallion on top, seats as a 2x2 grid */
+  .rt-table { width: 100%; height: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-top: 180px; margin-top: 14px; }
+  .rt-table::before, .rt-table::after, .rt-dot { display: none; }
+  .rt-center { top: 14px; transform: translateX(-50%); width: 140px; height: 140px; box-shadow: 0 0 0 10px rgba(129,119,106,0.18); }
+  .rt-seat, .rt-seat.n, .rt-seat.s, .rt-seat.e, .rt-seat.w { position: static; width: auto; transform: none; text-align: center; border: 1px solid var(--line); padding: 18px 12px; }
+  .rt-seat .stitle { font-size: 16px; }
   .rt-seat .stitle { font-size: 14px; }
   .rt-center { width: 130px; height: 130px; }
   .rt-center span { font-size: 18px; }

@@ -165,8 +165,8 @@
   function sectionRoundtable() {
     const P = C.roundtable;
     const seats = P.seats.map(s => `
+      <div class="rt-dot ${s.position}"></div>
       <div class="rt-seat ${s.position}">
-        <div class="dot"></div>
         <span class="stitle">${s.title}</span>
         <span class="ssub">${s.sub}</span>
       </div>`).join("");
