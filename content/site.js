@@ -50,7 +50,7 @@ window.SITE = {
     zelleEmail: "cole@longevityhousellc.com",                      // the email registered with Zelle, e.g. "cole@longevityhousellc.com"
     zelleName:  "Nicole Mathsen",   // the name Zelle shows the sender
     orderPrefix: "LH",                   // order numbers look like LH-7K2M9Q
-    sheetWebhook: "",                    // Google Apps Script web-app URL (leave "" until the sheet is set up)
+    sheetWebhook: "https://script.google.com/macros/s/AKfycbz-QvBnBRwitIDxMaLZ0RY9wUxv8E73rtOlJ5ky27xjc99IwEs6TpyLEm2Oikp9aXPV/exec",                    // Google Apps Script web-app URL (leave "" until the sheet is set up)
     supportEmail: "cole@longevityhousellc.com",
     supportPhone: "",                    // optional, e.g. "+1 (615) 555-0100"
     steps: [
