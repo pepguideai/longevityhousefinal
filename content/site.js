@@ -32,7 +32,7 @@ window.SITE = {
      When you have a Calendly / Acuity / Cal.com link, paste it here.
      Until then, leave it as "" and the Begin page shows a styled
      placeholder where the calendar will appear. */
-  bookingUrl: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ2MpsipnXrtpOUDTUvj2soqL6B4qb64YDXAbngnJQaSlnI5TcYtWg90EUw8Vvh3pm8hUVOMjMid?gv=true",
+  bookingUrl: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ3vi4vaHTpli_GDJCqaGtC9o5DXxpKrnQpZh2TCPoo-nPjVnO2IbXqhvPHHHDPu6F4lWM6zU4Zb?gv=true",
   bookingHeadline: "Book your first session",
   bookingSubtitle: "Free 20-minute intro call",
   bookingDuration: "20 min",
@@ -44,19 +44,24 @@ window.SITE = {
   bookingPoints: ["Choose any open time", "Video or phone — your call", "Confirmation straight to your inbox"],
 
   /* ---- CHECKOUT / PAYMENTS ----
-     The cart and checkout pages work now; real payment happens
-     through Stripe Payment Links. When Nicole has a Stripe account:
-     1. In Stripe, create a Payment Link for each offering
-     2. Paste each link between the quotes below
-     The checkout button then sends people to Stripe's secure page.
-     Until then, checkout shows a friendly "payments coming soon" note. */
+     Checkout is paid via Zelle. Fill in the Zelle details below.
+     Orders are logged to a Google Sheet via sheetWebhook (see README). */
   checkout: {
-    paymentLinks: {
-      single: "",   // Stripe Payment Link for Single Session
-      twelve: "",   // Stripe Payment Link for The Twelve
-      circle: "",   // Stripe Payment Link for Coaching Circle
-    },
-    pendingNote: "Online payment is almost ready. Submit your selection and Nicole will reach out to complete your booking — or step inside and book a free intro call.",
+    zelleEmail: "",                      // the email registered with Zelle, e.g. "cole@longevityhousellc.com"
+    zelleName:  "Longevity House LLC",   // the name Zelle shows the sender
+    orderPrefix: "LH",                   // order numbers look like LH-7K2M9Q
+    sheetWebhook: "",                    // Google Apps Script web-app URL (leave "" until the sheet is set up)
+    supportEmail: "cole@longevityhousellc.com",
+    supportPhone: "",                    // optional, e.g. "+1 (615) 555-0100"
+    steps: [
+      "Open your banking app and choose Zelle.",
+      "Send the exact amount to the email above.",
+      "Type your order number in the memo or note field.",
+      "Come back here and tap \u201cI\u2019ve sent my payment.\u201d",
+    ],
+    stepsNote: "Your sessions are confirmed once payment is verified. Include your order number so we can match your payment.",
+    thanksHeadline: "Thank you. Your order is received.",
+    thanksBody: "Payment pending verification. We\u2019ll email you once your Zelle payment is confirmed and reach out to schedule.",
   },
 
   /* ---- CONTACT (shown in the footer) ---- */
