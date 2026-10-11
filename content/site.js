@@ -47,8 +47,8 @@ window.SITE = {
      Checkout is paid via Zelle. Fill in the Zelle details below.
      Orders are logged to a Google Sheet via sheetWebhook (see README). */
   checkout: {
-    zelleEmail: "",                      // the email registered with Zelle, e.g. "cole@longevityhousellc.com"
-    zelleName:  "Longevity House LLC",   // the name Zelle shows the sender
+    zelleEmail: "cole@longevityhousellc.com",                      // the email registered with Zelle, e.g. "cole@longevityhousellc.com"
+    zelleName:  "Nicole Mathsen",   // the name Zelle shows the sender
     orderPrefix: "LH",                   // order numbers look like LH-7K2M9Q
     sheetWebhook: "",                    // Google Apps Script web-app URL (leave "" until the sheet is set up)
     supportEmail: "cole@longevityhousellc.com",
