@@ -469,43 +469,153 @@
 
   function buildCheckoutPage() {
     const mount = $("#page");
+    const CK = S.checkout || {};
     const lines = Cart.lines();
-    if (!lines.length) {
+    const empty = () => {
       mount.innerHTML = `
         <section class="section subpage"><div class="narrow">
           <div class="head-c"><div class="eyebrow">Checkout</div><h2>Nothing here <em>yet.</em></h2></div>
           <p class="empty">Choose a coaching path first, then come back to check out.</p>
           <div class="cart-actions center"><a href="index.html#pricing" class="btn solid">See the three ways to begin ${arrow}</a></div>
         </div></section>`;
-      return;
-    }
+    };
+
+    /* a finished order is remembered so a refresh on the thank-you screen keeps it */
+    let saved = null;
+    try { saved = JSON.parse(sessionStorage.getItem("lh-order")); } catch (e) {}
+    if (!lines.length && !saved) return empty();
+
+    const total = Cart.total();
     const rows = lines.map(l => `<div class="sum-row"><span>${l.tier.title} × ${l.qty}</span><span>${money(l.tier.priceNumber * l.qty)}</span></div>`).join("");
-    const links = (S.checkout && S.checkout.paymentLinks) || {};
-    const one = lines.length === 1 ? lines[0].tier.id : null;
-    const payUrl = one && links[one] && links[one].trim() ? links[one] : null;
-    mount.innerHTML = `
-      <section class="section subpage"><div class="narrow wide">
-        <div class="head-c"><div class="eyebrow">Checkout</div><h2>Almost <em>there.</em></h2></div>
-        <div class="co-grid">
-          <div class="co-form">
-            <div class="k">Your details</div>
-            <label><span>Name</span><input type="text" id="co-name" placeholder="Your name" /></label>
-            <label><span>Email</span><input type="email" id="co-email" placeholder="you@somewhere.com" /></label>
-            <label><span>Anything Nicole should know? <small>(optional)</small></span><textarea id="co-note" rows="3" placeholder="A line or two — whatever feels honest."></textarea></label>
+    const orderNo = () => {
+      const A = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let x = "";
+      for (let i = 0; i < 6; i++) x += A[Math.floor(Math.random() * A.length)];
+      return `${CK.orderPrefix || "LH"}-${x}`;
+    };
+    const copyRow = (label, val, cls = "") => `
+      <div class="z-row">
+        <div><div class="k">${label}</div><div class="z-val ${cls}">${val}</div></div>
+        <button class="btn z-copy" data-copy="${val}">Copy</button>
+      </div>`;
+
+    /* ---------- screen 1: details ---------- */
+    function screenDetails() {
+      mount.innerHTML = `
+        <section class="section subpage"><div class="narrow wide">
+          <div class="head-c"><div class="eyebrow">Checkout</div><h2>Almost <em>there.</em></h2></div>
+          <div class="co-grid">
+            <div class="co-form">
+              <div class="k">Your details</div>
+              <label><span>Full name</span><input type="text" id="co-name" autocomplete="name" placeholder="Your name" /></label>
+              <label><span>Email</span><input type="email" id="co-email" autocomplete="email" placeholder="you@somewhere.com" /></label>
+              <label><span>Phone <small>(optional)</small></span><input type="tel" id="co-phone" autocomplete="tel" placeholder="(555) 555-5555" /></label>
+              <label><span>Anything Nicole should know? <small>(optional)</small></span><textarea id="co-note" rows="3" placeholder="A line or two — whatever feels honest."></textarea></label>
+              <div class="k" style="margin-top:28px">Payment</div>
+              <div class="pay-opt">
+                <span class="radio"></span>
+                <span class="po-text"><span class="po-t">Zelle</span><span class="po-s">Payment instructions appear on the next step.</span></span>
+                <span class="zelle-mark">Z</span>
+              </div>
+              <div id="co-err" class="co-err" style="display:none"></div>
+            </div>
+            <div class="co-sum">
+              <div class="k">Order summary</div>
+              <div class="sum-list">${rows}</div>
+              <div class="sum-tot"><span>Total</span><span>${money(total)}</span></div>
+              <button class="btn solid pay" id="co-next">Continue to payment ${arrow}</button>
+              <p class="pay-note">No card needed. You’ll send the total via Zelle on the next step.</p>
+            </div>
           </div>
-          <div class="co-sum">
+        </div></section>`;
+      $("#co-next").addEventListener("click", () => {
+        const name = $("#co-name").value.trim(), email = $("#co-email").value.trim();
+        const err = $("#co-err");
+        if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          err.textContent = "Please add your name and a valid email so we can confirm your payment."; err.style.display = ""; return;
+        }
+        const order = {
+          id: orderNo(), ts: new Date().toISOString(), name, email,
+          phone: $("#co-phone").value.trim(), note: $("#co-note").value.trim(),
+          items: lines.map(l => ({ id: l.tier.id, title: l.tier.title, qty: l.qty, price: l.tier.priceNumber })),
+          total, status: "pending",
+        };
+        try { sessionStorage.setItem("lh-order", JSON.stringify(order)); } catch (e) {}
+        screenPay(order);
+        window.scrollTo(0, 0);
+      });
+    }
+
+    /* ---------- screen 2: pay via Zelle ---------- */
+    function screenPay(order) {
+      mount.innerHTML = `
+        <section class="section subpage"><div class="narrow">
+          <div class="zelle-card">
+            <div class="z-head">
+              <div>
+                <h2 class="z-h">Complete your <em>payment.</em></h2>
+                <p class="z-amt">Send <strong>${money(order.total)}</strong> via Zelle.</p>
+              </div>
+              <span class="zelle-mark lg">Z</span>
+            </div>
+            ${copyRow("Zelle email", CK.zelleEmail || "(Zelle email not set yet)")}
+            ${copyRow("Zelle name", CK.zelleName || "")}
+            ${copyRow("Order number", order.id, "serif")}
+            ${copyRow("Amount", money(order.total))}
+            <ol class="z-steps">${(CK.steps || []).map(t => `<li>${t}</li>`).join("")}</ol>
+            <p class="z-note">${CK.stepsNote || ""}</p>
+            <button class="btn solid pay" id="co-sent">I’ve sent my payment ${arrow}</button>
+          </div>
+        </div></section>`;
+      mount.querySelectorAll("[data-copy]").forEach(b => b.addEventListener("click", async () => {
+        try { await navigator.clipboard.writeText(b.dataset.copy); b.textContent = "Copied"; setTimeout(() => b.textContent = "Copy", 1400); } catch (e) {}
+      }));
+      $("#co-sent").addEventListener("click", async () => {
+        const btn = $("#co-sent"); btn.disabled = true; btn.textContent = "Recording…";
+        order.status = "sent"; order.sentTs = new Date().toISOString();
+        await logOrder(order);
+        try { sessionStorage.setItem("lh-order", JSON.stringify(order)); } catch (e) {}
+        Cart.clear();
+        screenThanks(order); window.scrollTo(0, 0);
+      });
+    }
+
+    /* ---------- screen 3: receipt ---------- */
+    function screenThanks(order) {
+      const items = order.items.map(i => `<div class="sum-row"><span>${i.title} × ${i.qty}</span><span>${money(i.price * i.qty)}</span></div>`).join("");
+      const phone = CK.supportPhone ? ` or call ${CK.supportPhone}` : "";
+      mount.innerHTML = `
+        <section class="section subpage"><div class="narrow">
+          <div class="eyebrow">Order ${order.id}</div>
+          <h2 class="th-h">${CK.thanksHeadline || "Thank you."}</h2>
+          <p class="lede">${CK.thanksBody || ""}</p>
+          <div class="hair"></div>
+          <div class="th-grid">
+            <div><div class="k">Amount sent</div><div class="th-amt">${money(order.total)}</div><div class="th-sub">via Zelle to ${CK.zelleEmail || ""}</div></div>
+            <div><div class="k">Confirmation to</div><div class="th-who">${order.name}</div><div class="th-sub">${order.email}${order.phone ? " · " + order.phone : ""}</div></div>
+          </div>
+          <div class="co-sum th-sum">
             <div class="k">Order summary</div>
-            <div class="sum-list">${rows}</div>
-            <div class="sum-tot"><span>Total</span><span>${money(Cart.total())}</span></div>
-            ${payUrl
-              ? `<a class="btn solid pay" href="${payUrl}">Pay securely ${arrow}</a><p class="pay-note">Payment is handled securely by Stripe.</p>`
-              : `<button class="btn solid pay" id="co-submit">Complete request ${arrow}</button><p class="pay-note">${(S.checkout && S.checkout.pendingNote) || "Payments are coming soon."}</p>`}
-            <div id="co-confirm" class="confirm" style="display:none;">Thank you — your selection is noted. Nicole will be in touch at the email you provided.</div>
+            <div class="sum-list">${items}</div>
+            <div class="sum-tot"><span>Total</span><span>${money(order.total)}</span></div>
           </div>
-        </div>
-      </div></section>`;
-    const sub = $("#co-submit");
-    if (sub) sub.addEventListener("click", () => { $("#co-confirm").style.display = ""; sub.disabled = true; sub.textContent = "Request received"; Cart.clear(); });
+          <p class="th-help">Questions about your order? Email <a href="mailto:${CK.supportEmail || S.contact.email}">${CK.supportEmail || S.contact.email}</a>${phone}. Quote ${order.id}.</p>
+          <a href="index.html" class="btn solid">Return to Longevity House ${arrow}</a>
+        </div></section>`;
+    }
+
+    /* ---------- Google Sheet logging ---------- */
+    async function logOrder(order) {
+      if (!CK.sheetWebhook) return;
+      const body = new URLSearchParams({
+        order: order.id, status: order.status, placed: order.ts, sent: order.sentTs || "",
+        name: order.name, email: order.email, phone: order.phone, note: order.note,
+        items: order.items.map(i => `${i.title} × ${i.qty}`).join("; "), total: order.total,
+      });
+      try { await fetch(CK.sheetWebhook, { method: "POST", mode: "no-cors", body }); } catch (e) {}
+    }
+
+    if (saved && saved.status === "sent" && !lines.length) screenThanks(saved);
+    else screenDetails();
   }
 
   /* ---------- BOOT ---------- */

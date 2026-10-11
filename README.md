@@ -113,3 +113,10 @@ These were intentionally left for later so we could get you live first:
 The site has image slots that fill automatically. Open `assets/img/README.txt` for the exact
 filenames. Drop a JPG with the right name into `assets/img/` and it appears — no code changes.
 Until a file exists, the slot shows a labelled placeholder so you can see what's missing.
+
+
+## Payments (Zelle)
+
+Checkout collects the client's details and shows Zelle instructions with an order number.
+Zelle email/name live in `content/site.js` under `checkout`. Orders log to a Google Sheet —
+setup is in `ZELLE-ORDERS-SHEET.md`.
