@@ -511,11 +511,16 @@
               <label><span>Phone <small>(optional)</small></span><input type="tel" id="co-phone" autocomplete="tel" placeholder="(555) 555-5555" /></label>
               <label><span>Anything Nicole should know? <small>(optional)</small></span><textarea id="co-note" rows="3" placeholder="A line or two — whatever feels honest."></textarea></label>
               <div class="k" style="margin-top:28px">Payment</div>
-              <div class="pay-opt">
+              <button type="button" class="pay-opt on" data-method="card" aria-pressed="true">
+                <span class="radio"></span>
+                <span class="po-text"><span class="po-t">Credit or debit card</span><span class="po-s">Secure card payment on the next step.</span></span>
+                <span class="card-mark" aria-hidden="true"></span>
+              </button>
+              <button type="button" class="pay-opt" data-method="zelle" aria-pressed="false">
                 <span class="radio"></span>
                 <span class="po-text"><span class="po-t">Zelle</span><span class="po-s">Payment instructions appear on the next step.</span></span>
                 <span class="zelle-mark">Z</span>
-              </div>
+              </button>
               <div id="co-err" class="co-err" style="display:none"></div>
             </div>
             <div class="co-sum">
@@ -523,10 +528,22 @@
               <div class="sum-list">${rows}</div>
               <div class="sum-tot"><span>Total</span><span>${money(total)}</span></div>
               <button class="btn solid pay" id="co-next">Continue to payment ${arrow}</button>
-              <p class="pay-note">No card needed. You’ll send the total via Zelle on the next step.</p>
+              <p class="pay-note" id="co-pay-note"></p>
             </div>
           </div>
         </div></section>`;
+      const notes = {
+        card: "Pay securely by card on the next step. Card details go straight to Stripe — we never see them.",
+        zelle: "No card needed. You’ll send the total via Zelle on the next step.",
+      };
+      let method = "card";
+      const pick = m => {
+        method = m;
+        mount.querySelectorAll(".pay-opt").forEach(o => { const on = o.dataset.method === m; o.classList.toggle("on", on); o.setAttribute("aria-pressed", on); });
+        $("#co-pay-note").textContent = notes[m];
+      };
+      mount.querySelectorAll(".pay-opt").forEach(o => o.addEventListener("click", () => pick(o.dataset.method)));
+      pick(method);
       $("#co-next").addEventListener("click", () => {
         const name = $("#co-name").value.trim(), email = $("#co-email").value.trim();
         const err = $("#co-err");
@@ -537,12 +554,121 @@
           id: orderNo(), ts: new Date().toISOString(), name, email,
           phone: $("#co-phone").value.trim(), note: $("#co-note").value.trim(),
           items: lines.map(l => ({ id: l.tier.id, title: l.tier.title, qty: l.qty, price: l.tier.priceNumber })),
-          total, status: "pending",
+          total, status: "pending", method,
         };
         try { sessionStorage.setItem("lh-order", JSON.stringify(order)); } catch (e) {}
-        screenPay(order);
+        if (method === "card") screenCard(order); else screenPay(order);
         window.scrollTo(0, 0);
       });
+    }
+
+    /* ---------- screen 2a: pay by card (Stripe embedded form) ---------- */
+    const appearance = {
+      theme: "stripe",
+      labels: "auto",
+      inputs: "spaced",
+      variables: {
+        borderRadius: "4px",
+        colorBackground: "#ffffff",
+        colorDanger: "#df1b41",
+        colorPrimary: "#0570de",
+        colorSuccess: "#00c853",
+        colorText: "#30313d",
+        fontFamily: "default",
+        fontSizeBase: "16px",
+        spacingUnit: "4px",
+      },
+    };
+    function screenCard(order, notice) {
+      mount.innerHTML = `
+        <section class="section subpage"><div class="narrow">
+          <div class="zelle-card card-pay">
+            <div class="z-head">
+              <div>
+                <h2 class="z-h">Complete your <em>payment.</em></h2>
+                <p class="z-amt">Pay <strong>${money(order.total)}</strong> by card · Order ${order.id}</p>
+              </div>
+              <span class="card-mark lg" aria-hidden="true"></span>
+            </div>
+            <div id="co-err" class="co-err" ${notice ? "" : 'style="display:none"'}>${notice || ""}</div>
+            <div class="stripe-wrap"><div id="checkout-form"><p class="stripe-loading">Loading secure card form…</p></div></div>
+            <p class="z-note">Payments are processed by Stripe. Your card details never touch our servers.</p>
+            <button class="textlink" id="co-back" type="button">← Pay with Zelle instead</button>
+          </div>
+        </div></section>`;
+      const err = $("#co-err");
+      const fail = msg => { err.textContent = msg; err.style.display = ""; };
+      $("#co-back").addEventListener("click", () => {
+        order.method = "zelle";
+        try { sessionStorage.setItem("lh-order", JSON.stringify(order)); } catch (e) {}
+        screenPay(order); window.scrollTo(0, 0);
+      });
+      if (typeof window.Stripe !== "function") return fail("The card form couldn’t load. Check your connection, or pay with Zelle instead.");
+
+      (async () => {
+        try {
+          const r = await fetch("/api/create-checkout-session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              items: order.items.map(i => ({ id: i.id, qty: i.qty })),
+              order: { id: order.id, name: order.name, email: order.email, phone: order.phone, note: order.note },
+            }),
+          });
+          const json = await r.json().catch(() => ({}));
+          if (!r.ok || !json.client_secret || !json.publishable_key) throw new Error(json.error || "Card checkout isn’t available right now.");
+
+          const stripe = window.Stripe(json.publishable_key);
+          const checkout = stripe.initCheckoutFormSdk({ clientSecret: Promise.resolve(json.client_secret), appearance });
+          $("#checkout-form").innerHTML = "";
+          const form = checkout.createForm({ layout: "expanded" });
+          form.mount("#checkout-form");
+
+          const loadActionsResult = await checkout.loadActions();
+          if (loadActionsResult.type !== "success") throw new Error("The card form couldn’t start. Please refresh and try again.");
+          form.on("confirm", async (event) => {
+            err.style.display = "none";
+            try {
+              const result = await loadActionsResult.actions.confirm({ formConfirmEvent: event });
+              if (result && result.type === "error") fail(result.error.message);
+              /* on success Stripe redirects back here with ?session_id=… */
+            } catch (e) {
+              console.error("Payment confirmation error:", e);
+              fail("Something went wrong confirming your payment. You have not been charged twice — please try again.");
+            }
+          });
+        } catch (e) {
+          console.error(e);
+          $(".stripe-wrap").style.display = "none";
+          const msg = e instanceof TypeError ? "We couldn’t reach the payment server." : e.message;
+          fail(`${msg} Please try again in a moment, or pay with Zelle instead.`);
+        }
+      })();
+    }
+
+    /* ---------- return from Stripe: verify the card payment ---------- */
+    async function handleCardReturn(sessionId) {
+      mount.innerHTML = `<section class="section subpage"><div class="narrow"><p class="stripe-loading">Confirming your payment…</p></div></section>`;
+      history.replaceState(null, "", "checkout.html");
+      const order = saved || { id: "", items: [], total: 0, name: "", email: "", method: "card" };
+      try {
+        const r = await fetch(`/api/session-status?session_id=${encodeURIComponent(sessionId)}`);
+        const s = await r.json();
+        if (!r.ok) throw new Error(s.error);
+        if (s.status === "complete") {
+          order.status = "paid"; order.method = "card"; order.sentTs = new Date().toISOString();
+          if (s.order) order.id = s.order;
+          if (!order.total && s.amount_total) order.total = s.amount_total / 100;
+          if (!order.email && s.email) order.email = s.email;
+          await logOrder(order);
+          try { sessionStorage.setItem("lh-order", JSON.stringify(order)); } catch (e) {}
+          Cart.clear();
+          return screenThanks(order);
+        }
+        if (saved && saved.items.length) return screenCard(saved, "Your payment didn’t go through. Please try again, or pay with Zelle.");
+      } catch (e) { console.error(e); }
+      if (saved && saved.status === "paid") return screenThanks(saved);
+      lines.length ? screenDetails() : empty();
     }
 
     /* ---------- screen 2: pay via Zelle ---------- */
@@ -583,14 +709,15 @@
     function screenThanks(order) {
       const items = order.items.map(i => `<div class="sum-row"><span>${i.title} × ${i.qty}</span><span>${money(i.price * i.qty)}</span></div>`).join("");
       const phone = CK.supportPhone ? ` or call ${CK.supportPhone}` : "";
+      const card = order.method === "card";
       mount.innerHTML = `
         <section class="section subpage"><div class="narrow">
           <div class="eyebrow">Order ${order.id}</div>
           <h2 class="th-h">${CK.thanksHeadline || "Thank you."}</h2>
-          <p class="lede">${CK.thanksBody || ""}</p>
+          <p class="lede">${card ? (CK.cardThanksBody || "") : (CK.thanksBody || "")}</p>
           <div class="hair"></div>
           <div class="th-grid">
-            <div><div class="k">Amount sent</div><div class="th-amt">${money(order.total)}</div><div class="th-sub">via Zelle to ${CK.zelleEmail || ""}</div></div>
+            <div><div class="k">${card ? "Amount paid" : "Amount sent"}</div><div class="th-amt">${money(order.total)}</div><div class="th-sub">${card ? "by card · receipt emailed by Stripe" : `via Zelle to ${CK.zelleEmail || ""}`}</div></div>
             <div><div class="k">Confirmation to</div><div class="th-who">${order.name}</div><div class="th-sub">${order.email}${order.phone ? " · " + order.phone : ""}</div></div>
           </div>
           <div class="co-sum th-sum">
@@ -607,14 +734,16 @@
     async function logOrder(order) {
       if (!CK.sheetWebhook) return;
       const body = new URLSearchParams({
-        order: order.id, status: order.status, placed: order.ts, sent: order.sentTs || "",
+        order: order.id, status: order.method === "card" ? "paid (card)" : order.status, placed: order.ts, sent: order.sentTs || "",
         name: order.name, email: order.email, phone: order.phone, note: order.note,
         items: order.items.map(i => `${i.title} × ${i.qty}`).join("; "), total: order.total,
       });
       try { await fetch(CK.sheetWebhook, { method: "POST", mode: "no-cors", body }); } catch (e) {}
     }
 
-    if (saved && saved.status === "sent" && !lines.length) screenThanks(saved);
+    const sessionId = new URLSearchParams(location.search).get("session_id");
+    if (sessionId) handleCardReturn(sessionId);
+    else if (saved && (saved.status === "sent" || saved.status === "paid") && !lines.length) screenThanks(saved);
     else screenDetails();
   }
 
