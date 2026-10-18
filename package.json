@@ -1,0 +1,8 @@
+{
+  "name": "longevityhousefinal",
+  "private": true,
+  "description": "Longevity House site. Static pages + Vercel functions in /api for Stripe card payments.",
+  "dependencies": {
+    "stripe": "^23.0.0"
+  }
+}

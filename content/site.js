@@ -44,7 +44,9 @@ window.SITE = {
   bookingPoints: ["Choose any open time", "Video or phone — your call", "Confirmation straight to your inbox"],
 
   /* ---- CHECKOUT / PAYMENTS ----
-     Checkout is paid via Zelle. Fill in the Zelle details below.
+     Clients pay by credit/debit card (Stripe) or Zelle.
+     Card keys live in Vercel, not here (see STRIPE_INTEGRATION_TODO.md).
+     Fill in the Zelle details below.
      Orders are logged to a Google Sheet via sheetWebhook (see README). */
   checkout: {
     zelleEmail: "cole@longevityhousellc.com",                      // the email registered with Zelle, e.g. "cole@longevityhousellc.com"
@@ -62,6 +64,7 @@ window.SITE = {
     stepsNote: "Your sessions are confirmed once payment is verified. Include your order number so we can match your payment.",
     thanksHeadline: "Thank you. Your order is received.",
     thanksBody: "Payment pending verification. We\u2019ll email you once your Zelle payment is confirmed and reach out to schedule.",
+    cardThanksBody: "Your card payment went through. A receipt is on its way to your inbox, and we\u2019ll reach out shortly to schedule.",
   },
 
   /* ---- CONTACT (shown in the footer) ---- */

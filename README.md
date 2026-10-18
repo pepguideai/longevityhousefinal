@@ -115,8 +115,11 @@ filenames. Drop a JPG with the right name into `assets/img/` and it appears — 
 Until a file exists, the slot shows a labelled placeholder so you can see what's missing.
 
 
-## Payments (Zelle)
+## Payments (card + Zelle)
 
-Checkout collects the client's details and shows Zelle instructions with an order number.
+Clients choose **credit/debit card** (Stripe) or **Zelle** at checkout. Card setup (keys, prices,
+test cards) is in `STRIPE_INTEGRATION_TODO.md`.
+
+For Zelle, checkout collects the client's details and shows Zelle instructions with an order number.
 Zelle email/name live in `content/site.js` under `checkout`. Orders log to a Google Sheet —
 setup is in `ZELLE-ORDERS-SHEET.md`.
