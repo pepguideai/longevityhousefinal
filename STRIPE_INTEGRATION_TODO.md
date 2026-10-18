@@ -15,11 +15,13 @@ These values are placeholders. Update them before going live.
 | Field | Current Value | What to Set |
 |-------|--------------|-------------|
 | mode | payment | Keep `"payment"`: all three coaching tiers are one-time charges. Change it to `"subscription"` only if you later sell recurring plans. In that case also add `payment_method_collection: "always"` and use recurring Prices. |
-| line_items[].price → `PRICES.single` | price_... | The Stripe Price ID for **Single Session ($110)**. |
-| line_items[].price → `PRICES.twelve` | price_... | The Stripe Price ID for **The Twelve ($1,200)**. |
-| line_items[].price → `PRICES.circle` | price_... | The Stripe Price ID for **Coaching Circle ($10)**. |
-| STRIPE_PUBLISHABLE_KEY | pk_test_... | Your publishable key (https://dashboard.stripe.com/test/apikeys). |
-| STRIPE_SECRET_KEY | sk_test_... | Your secret key, from the same page. |
+| line_items[].price → `PRICES.single` | price_1URyCXI5XoBOVWrEOiT3WM0Y (test) | ✅ Set for test mode. Replace with the **live** Price ID for Single Session ($110) when going live. |
+| line_items[].price → `PRICES.twelve` | price_1URyFcI5XoBOVWrEEww2YaAG (test) | ✅ Set for test mode. Replace with the **live** Price ID for The Twelve ($1,200) when going live. |
+| line_items[].price → `PRICES.circle` | price_1URyITI5XoBOVWrEMiiNVlNc (test) | ✅ Set for test mode. Replace with the **live** Price ID for Coaching Circle ($10) when going live. |
+| STRIPE_PUBLISHABLE_KEY | (set in Vercel) | ✅ Test key added in Vercel. Swap for `pk_live_…` when going live. |
+| STRIPE_SECRET_KEY | (set in Vercel) | ✅ Test key added in Vercel. Swap for `sk_live_…` when going live. |
+
+**Live mode needs its own Prices.** Test-mode Price IDs don't work with live keys. When going live, create the three products again with the Dashboard in live mode and swap the IDs above.
 
 **Creating the Prices:** in the Stripe Dashboard go to **Product catalog → + Add product** (https://dashboard.stripe.com/products). Create one product per tier and give each a **one-time** price. Copy each Price ID (it starts with `price_`) into `PRICES` in `api/create-checkout-session.js`.
 

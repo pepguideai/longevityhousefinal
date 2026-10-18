@@ -10,11 +10,11 @@ const Stripe = require("stripe");
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2026-03-25.dahlia" });
 
 /* One Stripe Price ID per coaching tier (ids match content/coaching.js).
-   TODO: replace each price_... with the real Price ID from https://dashboard.stripe.com/prices */
+   These are TEST-mode prices. Swap in the live-mode Price IDs when going live. */
 const PRICES = {
-  single: "price_...",   // Single Session · $110
-  twelve: "price_...",   // The Twelve · $1,200
-  circle: "price_...",   // Coaching Circle · $10 per person
+  single: "price_1URyCXI5XoBOVWrEOiT3WM0Y",   // Single Session · $110
+  twelve: "price_1URyFcI5XoBOVWrEEww2YaAG",   // The Twelve · $1,200
+  circle: "price_1URyITI5XoBOVWrEMiiNVlNc",   // Coaching Circle · $10 per person
 };
 
 module.exports = async (req, res) => {
