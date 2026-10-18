@@ -22,6 +22,6 @@ module.exports = async (req, res) => {
     });
   } catch (err) {
     console.error("Stripe session lookup error:", err.message);
-    res.status(500).json({ error: "Couldn't look up that payment." });
+    res.status(500).json({ error: "Couldn't look up that payment.", code: err.code || err.type || "unknown" });
   }
 };

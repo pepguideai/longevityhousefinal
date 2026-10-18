@@ -48,6 +48,7 @@ module.exports = async (req, res) => {
     res.status(200).json({ client_secret: session.client_secret, publishable_key: process.env.STRIPE_PUBLISHABLE_KEY });
   } catch (err) {
     console.error("Stripe checkout session error:", err.message);
-    res.status(500).json({ error: "We couldn’t start card checkout." });
+    /* err.code (e.g. "resource_missing") is safe to expose and makes problems diagnosable */
+    res.status(500).json({ error: "We couldn’t start card checkout.", code: err.code || err.type || "unknown", param: err.param });
   }
 };
