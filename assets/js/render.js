@@ -498,8 +498,17 @@
         <button class="btn z-copy" data-copy="${val}">Copy</button>
       </div>`;
 
+    /* stripeEnabled: false hides card checkout. The Stripe screens below stay in place. */
+    const stripeOn = CK.stripeEnabled !== false;
+
     /* ---------- screen 1: details ---------- */
     function screenDetails() {
+      const cardOpt = stripeOn ? `
+              <button type="button" class="pay-opt on" data-method="card" aria-pressed="true">
+                <span class="radio"></span>
+                <span class="po-text"><span class="po-t">Credit or debit card</span><span class="po-s">Secure card payment on the next step.</span></span>
+                <span class="card-mark" aria-hidden="true"></span>
+              </button>` : "";
       mount.innerHTML = `
         <section class="section subpage"><div class="narrow wide">
           <div class="head-c"><div class="eyebrow">Checkout</div><h2>Almost <em>there.</em></h2></div>
@@ -511,12 +520,8 @@
               <label><span>Phone <small>(optional)</small></span><input type="tel" id="co-phone" autocomplete="tel" placeholder="(555) 555-5555" /></label>
               <label><span>Anything Nicole should know? <small>(optional)</small></span><textarea id="co-note" rows="3" placeholder="A line or two — whatever feels honest."></textarea></label>
               <div class="k" style="margin-top:28px">Payment</div>
-              <button type="button" class="pay-opt on" data-method="card" aria-pressed="true">
-                <span class="radio"></span>
-                <span class="po-text"><span class="po-t">Credit or debit card</span><span class="po-s">Secure card payment on the next step.</span></span>
-                <span class="card-mark" aria-hidden="true"></span>
-              </button>
-              <button type="button" class="pay-opt" data-method="zelle" aria-pressed="false">
+              ${cardOpt}
+              <button type="button" class="pay-opt${stripeOn ? "" : " on"}" data-method="zelle" aria-pressed="${stripeOn ? "false" : "true"}">
                 <span class="radio"></span>
                 <span class="po-text"><span class="po-t">Zelle</span><span class="po-s">Payment instructions appear on the next step.</span></span>
                 <span class="zelle-mark">Z</span>
@@ -536,7 +541,7 @@
         card: "Pay securely by card on the next step. Card details go straight to Stripe — we never see them.",
         zelle: "No card needed. You’ll send the total via Zelle on the next step.",
       };
-      let method = "card";
+      let method = stripeOn ? "card" : "zelle";
       const pick = m => {
         method = m;
         mount.querySelectorAll(".pay-opt").forEach(o => { const on = o.dataset.method === m; o.classList.toggle("on", on); o.setAttribute("aria-pressed", on); });
@@ -557,7 +562,7 @@
           total, status: "pending", method,
         };
         try { sessionStorage.setItem("lh-order", JSON.stringify(order)); } catch (e) {}
-        if (method === "card") screenCard(order); else screenPay(order);
+        if (stripeOn && method === "card") screenCard(order); else screenPay(order);
         window.scrollTo(0, 0);
       });
     }
@@ -580,6 +585,12 @@
       },
     };
     function screenCard(order, notice) {
+      if (!stripeOn) {
+        order.method = "zelle";
+        try { sessionStorage.setItem("lh-order", JSON.stringify(order)); } catch (e) {}
+        screenPay(order);
+        return;
+      }
       mount.innerHTML = `
         <section class="section subpage"><div class="narrow">
           <div class="zelle-card card-pay">
@@ -742,8 +753,13 @@
     }
 
     const sessionId = new URLSearchParams(location.search).get("session_id");
-    if (sessionId) handleCardReturn(sessionId);
+    if (sessionId && stripeOn) handleCardReturn(sessionId);
     else if (saved && (saved.status === "sent" || saved.status === "paid") && !lines.length) screenThanks(saved);
+    else if (sessionId && saved && saved.items && saved.items.length) {
+      saved.method = "zelle";
+      try { sessionStorage.setItem("lh-order", JSON.stringify(saved)); } catch (e) {}
+      screenPay(saved);
+    }
     else screenDetails();
   }
 
