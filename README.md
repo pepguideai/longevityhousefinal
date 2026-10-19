@@ -115,11 +115,21 @@ filenames. Drop a JPG with the right name into `assets/img/` and it appears — 
 Until a file exists, the slot shows a labelled placeholder so you can see what's missing.
 
 
-## Payments (card + Zelle)
+## Payments (Zelle live, Stripe paused)
 
-Clients choose **credit/debit card** (Stripe) or **Zelle** at checkout. Card setup (keys, prices,
-test cards) is in `STRIPE_INTEGRATION_TODO.md`.
+Checkout currently offers **Zelle only**. Stripe card checkout is still in the repo (the checkout
+screens, `checkout.html` Stripe.js include, and `/api` handlers) but hidden from the page.
+
+**To turn Stripe back on:** open `content/site.js`, find `checkout`, and set `stripeEnabled` to `true`:
+
+```
+stripeEnabled: true,
+```
+
+Save and refresh. The credit/debit card option comes back, and checkout will use Stripe again.
+Card setup (keys, prices, test cards) is unchanged in `STRIPE_INTEGRATION_TODO.md`.
 
 For Zelle, checkout collects the client's details and shows Zelle instructions with an order number.
-Zelle email/name live in `content/site.js` under `checkout`. Orders log to a Google Sheet —
-setup is in `ZELLE-ORDERS-SHEET.md`.
+Zelle email/name live in `content/site.js` under `checkout`. When the client taps **I’ve sent my payment**,
+the page posts the order (no-cors) to the Google Sheet webhook in `checkout.sheetWebhook`.
+Sheet setup is in `ZELLE-ORDERS-SHEET.md`.

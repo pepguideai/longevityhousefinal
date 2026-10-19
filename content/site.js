@@ -44,11 +44,14 @@ window.SITE = {
   bookingPoints: ["Choose any open time", "Video or phone — your call", "Confirmation straight to your inbox"],
 
   /* ---- CHECKOUT / PAYMENTS ----
-     Clients pay by credit/debit card (Stripe) or Zelle.
-     Card keys live in Vercel, not here (see STRIPE_INTEGRATION_TODO.md).
+     Zelle is the live checkout method. Stripe card checkout is still
+     in the repo (see STRIPE_INTEGRATION_TODO.md) but hidden while
+     stripeEnabled is false. Set stripeEnabled to true to show the
+     credit/debit card option again. Card keys live in Vercel, not here.
      Fill in the Zelle details below.
      Orders are logged to a Google Sheet via sheetWebhook (see README). */
   checkout: {
+    stripeEnabled: false,            // false = Zelle only. true = show Stripe card checkout again.
     zelleEmail: "cole@longevityhousellc.com",                      // the email registered with Zelle, e.g. "cole@longevityhousellc.com"
     zelleName:  "Nicole Mathsen",   // the name Zelle shows the sender
     orderPrefix: "LH",                   // order numbers look like LH-7K2M9Q
